@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Missed Call Calculator</title>
+<style>
+  :root {
+    --bg: #f4f6f3;
+    --card: #ffffff;
+    --text: #1f2a24;
+    --muted: #5d6b63;
+    --green: #1f7a4d;
+    --green-dark: #165c3a;
+    --red: #c0392b;
+    --border: #dde3de;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+  }
+  .wrap { max-width: 560px; margin: 0 auto; padding: 32px 16px 48px; }
+  .demo-note {
+    font-size: 13px; color: var(--muted); text-align: center;
+    margin-bottom: 20px;
+  }
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 24px; margin-bottom: 20px;
+  }
+  h1 { font-size: 26px; line-height: 1.25; margin: 0 0 8px; }
+  .sub { color: var(--muted); margin: 0 0 20px; }
+  label { display: block; font-weight: 600; margin: 16px 0 6px; }
+  .hint { font-weight: 400; color: var(--muted); font-size: 14px; }
+  input, select {
+    width: 100%; padding: 12px; font-size: 16px;
+    border: 1px solid var(--border); border-radius: 8px;
+  }
+  button {
+    width: 100%; margin-top: 22px; padding: 14px; font-size: 17px;
+    font-weight: 700; color: #fff; background: var(--green);
+    border: none; border-radius: 8px; cursor: pointer;
+  }
+  button:hover { background: var(--green-dark); }
+  .hidden { display: none; }
+  .result-label { color: var(--muted); margin: 0; }
+  .big {
+    font-size: 40px; font-weight: 800; color: var(--red); margin: 4px 0 8px;
+  }
+  .breakdown { color: var(--muted); font-size: 15px; margin: 0 0 16px; }
+  .thanks { text-align: center; }
+  .thanks h2 { color: var(--green); margin-top: 0; }
+  footer { text-align: center; font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="demo-note">Concept demo by Tehreem Muzammil · not an official plancraft page · no data is sent anywhere</p>
+
+  <!-- Step 1: Calculator -->
+  <div class="card" id="calculator">
+    <h1>How much money do missed calls cost you?</h1>
+    <p class="sub">You're on the roof, under a sink, or on holiday, and the phone rings. Find out what those missed calls cost your business every year.</p>
+
+    <label for="calls">Missed calls per week <span class="hint">(be honest)</span></label>
+    <input type="number" id="calls" min="0" value="5">
+
+    <label for="jobValue">Average value of a job (€)</label>
+    <input type="number" id="jobValue" min="0" value="800">
+
+    <label for="winRate">How many callers become a job? (%)</label>
+    <input type="number" id="winRate" min="0" max="100" value="30">
+
+    <button id="calcBtn">Calculate my lost revenue</button>
+  </div>
+
+  <!-- Step 2: Result -->
+  <div class="card hidden" id="result">
+    <p class="result-label">Estimated revenue you lose per year:</p>
+    <p class="big" id="lostMoney">€0</p>
+    <p class="breakdown" id="breakdown"></p>
+    <p>An AI phone assistant answers every call, 24/7, and sends you a short summary, so no job slips away.</p>
+    <button id="ctaBtn">Get 60 free minutes of AI phone answering</button>
+  </div>
+
+  <!-- Step 3: Lead form -->
+  <div class="card hidden" id="leadForm">
+    <h2>Almost there</h2>
+    <p class="sub">Leave your details and we'll set up your free AI phone minutes.</p>
+
+    <label for="email">Work email</label>
+    <input type="email" id="email" placeholder="you@company.com">
+
+    <label for="trade">Your trade</label>
+    <select id="trade">
+      <option value="">Please choose</option>
+      <option>Roofer</option>
+      <option>Electrician</option>
+      <option>Plumber / Heating</option>
+      <option>Painter</option>
+      <option>Carpenter</option>
+      <option>Tiler</option>
+      <option>Other</option>
+    </select>
+
+    <label for="teamSize">Team size</label>
+    <select id="teamSize">
+      <option value="">Please choose</option>
+      <option>Just me</option>
+      <option>2–4</option>
+      <option>5–9</option>
+      <option>10+</option>
+    </select>
+
+    <button id="submitBtn">Claim my free minutes</button>
+  </div>
+
+  <!-- Step 4: Thank you -->
+  <div class="card hidden thanks" id="thanks">
+    <h2>Thank you!</h2>
+    <p>In a live version, your details would go straight to the sales team in HubSpot, and you'd get a call within one working day.</p>
+  </div>
+
+  <footer>Built as a growth experiment concept with Claude.</footer>
+</div>
+
+<script>
+  // Simple tracking: in a live version this would send events to GA4 / Mixpanel.
+  window.dataLayer = window.dataLayer || [];
+  function track(eventName, data) {
+    window.dataLayer.push(Object.assign({ event: eventName }, data || {}));
+    console.log("Tracked:", eventName, data || {});
+  }
+
+  track("calculator_view");
+
+  const WORKING_WEEKS = 46;
+  const euro = n => "€" + Math.round(n).toLocaleString("en-US");
+
+  document.getElementById("calcBtn").addEventListener("click", function () {
+    const calls = Number(document.getElementById("calls").value) || 0;
+    const jobValue = Number(document.getElementById("jobValue").value) || 0;
+    const winRate = (Number(document.getElementById("winRate").value) || 0) / 100;
+
+    const lostJobs = calls * winRate * WORKING_WEEKS;
+    const lostMoney = lostJobs * jobValue;
+
+    document.getElementById("lostMoney").textContent = euro(lostMoney);
+    document.getElementById("breakdown").textContent =
+      calls + " missed calls a week × " + Math.round(winRate * 100) +
+      "% win rate × " + WORKING_WEEKS + " working weeks ≈ " +
+      Math.round(lostJobs) + " lost jobs worth " + euro(jobValue) + " each.";
+
+    document.getElementById("result").classList.remove("hidden");
+    document.getElementById("result").scrollIntoView({ behavior: "smooth" });
+
+    track("calculator_complete", { lost_revenue: Math.round(lostMoney) });
+  });
+
+  document.getElementById("ctaBtn").addEventListener("click", function () {
+    document.getElementById("leadForm").classList.remove("hidden");
+    document.getElementById("leadForm").scrollIntoView({ behavior: "smooth" });
+    track("cta_click");
+  });
+
+  document.getElementById("submitBtn").addEventListener("click", function () {
+    const email = document.getElementById("email").value.trim();
+    const trade = document.getElementById("trade").value;
+    const teamSize = document.getElementById("teamSize").value;
+
+    if (!email.includes("@") || !trade || !teamSize) {
+      alert("Please fill in your email, trade and team size.");
+      return;
+    }
+
+    // Demo only: nothing is sent. Live version: send to HubSpot Forms API.
+    track("lead_submit", { trade: trade, team_size: teamSize });
+
+    document.getElementById("leadForm").classList.add("hidden");
+    document.getElementById("result").classList.add("hidden");
+    document.getElementById("calculator").classList.add("hidden");
+    document.getElementById("thanks").classList.remove("hidden");
+  });
+</script>
+</body>
+</html>
