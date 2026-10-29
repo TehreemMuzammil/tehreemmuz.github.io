@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Missed-Call Calculator · A/B Test</title>
+<style>
+  :root {
+    --green: #1f7a52; --green-dark: #155c3d; --green-light: #e8f5ee;
+    --red: #c0392b; --blue: #2563eb; --ink: #1d2b24; --muted: #6b7a72;
+    --bg: #f4f6f4; --card: #ffffff; --line: #e1e7e3;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Segoe UI", system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--ink); line-height: 1.5; }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 24px 16px 48px; }
+  .wide { max-width: 980px; }
+  .note { text-align: center; font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; align-items: center; background: #fff8e1; border: 1px solid #f0dc9a; border-radius: 10px; padding: 8px 12px; font-size: 13px; margin-bottom: 20px; }
+  .toolbar b { color: #8a6d00; }
+  .pill { display: inline-block; padding: 2px 10px; border-radius: 999px; font-weight: 700; color: #fff; }
+  .pill.A { background: var(--red); } .pill.B { background: var(--blue); }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 28px 24px; margin-bottom: 16px; }
+  h1 { font-size: 26px; margin: 0 0 8px; line-height: 1.25; }
+  h2 { font-size: 20px; margin: 0 0 12px; }
+  .sub { color: var(--muted); margin: 0 0 20px; }
+  label { display: block; font-weight: 600; font-size: 14px; margin: 14px 0 6px; }
+  input, select { width: 100%; padding: 11px 12px; font-size: 16px; border: 1px solid #cfd8d3; border-radius: 10px; background: #fff; }
+  input:focus, select:focus { outline: 2px solid var(--green); border-color: var(--green); }
+  button { cursor: pointer; font: inherit; }
+  .btn { display: block; width: 100%; margin-top: 20px; padding: 14px; font-size: 17px; font-weight: 700; color: #fff; background: var(--green); border: 0; border-radius: 10px; }
+  .btn:hover { background: var(--green-dark); }
+  .small-btn { padding: 6px 12px; font-size: 13px; border: 1px solid #cfd8d3; background: #fff; border-radius: 8px; }
+  .small-btn:hover { background: var(--green-light); }
+  .small-btn.primary { background: var(--green); color: #fff; border-color: var(--green); }
+  .big { font-size: 44px; font-weight: 800; margin: 8px 0; line-height: 1.1; }
+  .big.A { color: var(--red); } .big.B { color: var(--blue); }
+  .breakdown { color: var(--muted); font-size: 14px; }
+  .hidden { display: none; }
+  .center { text-align: center; }
+  .footer { text-align: center; font-size: 13px; color: var(--muted); margin-top: 24px; }
+  .footer a { color: var(--green); }
+  /* Dashboard */
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } .big { font-size: 36px; } }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { padding: 8px 6px; text-align: right; border-bottom: 1px solid var(--line); }
+  th:first-child, td:first-child { text-align: left; }
+  th { color: var(--muted); font-weight: 600; }
+  .bar-row { margin: 10px 0; }
+  .bar-label { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px; }
+  .bar-track { background: #eef2ef; border-radius: 6px; height: 14px; overflow: hidden; }
+  .bar { height: 100%; border-radius: 6px; transition: width .4s; }
+  .bar.A { background: var(--red); } .bar.B { background: var(--blue); }
+  .verdict { padding: 16px; border-radius: 12px; font-size: 15px; }
+  .verdict.win { background: var(--green-light); border: 1px solid #b7dfc8; }
+  .verdict.wait { background: #fff8e1; border: 1px solid #f0dc9a; }
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+  @media (max-width: 720px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
+  .kpi { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px; }
+  .kpi .v { font-size: 22px; font-weight: 800; }
+  .kpi .l { font-size: 12px; color: var(--muted); }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .muted { color: var(--muted); font-size: 13px; }
+</style>
+</head>
+<body>
+
+<!-- ================= CALCULATOR VIEW ================= -->
+<div id="calcView" class="wrap">
+  <div class="note">Concept demo by Tehreem Muzammil · not an official plancraft page · runs only in this browser, no data is sent anywhere</div>
+
+  <div class="toolbar">
+    <span>Demo mode · You are seeing variant <span id="variantPill" class="pill A">A</span></span>
+    <button class="small-btn" id="newVisitorBtn">New visitor</button>
+    <button class="small-btn primary" id="toDashBtn">Dashboard</button>
+  </div>
+
+  <!-- Step 1: calculator -->
+  <div id="stepCalc" class="card">
+    <h1 id="headline">How much money do missed calls cost you?</h1>
+    <p class="sub" id="subline">Every call you can't take on the roof or after work is a job that might go to a competitor.</p>
+
+    <label for="calls">Missed calls per week</label>
+    <input id="calls" type="number" min="0" value="5">
+
+    <label for="jobValue">Average job value (€)</label>
+    <input id="jobValue" type="number" min="0" value="800">
+
+    <label for="winRate">How many of those callers would become customers? (%)</label>
+    <input id="winRate" type="number" min="0" max="100" value="30">
+
+    <button class="btn" id="calcBtn">Calculate</button>
+  </div>
+
+  <!-- Step 2: result -->
+  <div id="stepResult" class="card center hidden">
+    <div id="resultIntro">Missed calls cost you about</div>
+    <div class="big A" id="resultBig">€0</div>
+    <div class="breakdown" id="breakdown"></div>
+    <p id="resultPitch" style="margin-top:20px;">Porta answers every call for you, 24/7, and turns it into a new enquiry.</p>
+    <button class="btn" id="ctaBtn">Try Porta with 60 free minutes</button>
+  </div>
+
+  <!-- Step 3: lead form -->
+  <div id="stepForm" class="card hidden">
+    <h2>Get your 60 free minutes</h2>
+    <label for="email">Work email</label>
+    <input id="email" type="email" placeholder="name@company.de">
+
+    <label for="trade">Trade</label>
+    <select id="trade">
+      <option value="">Please choose</option>
+      <option>Roofer</option><option>Electrician</option><option>Plumber / heating</option>
+      <option>Carpenter</option><option>Painter</option><option>Other</option>
+    </select>
+
+    <label for="team">Team size</label>
+    <select id="team">
+      <option value="">Please choose</option>
+      <option>Just me</option><option>2–5</option><option>6–20</option><option>20+</option>
+    </select>
+
+    <button class="btn" id="submitBtn">Start for free</button>
+  </div>
+
+  <!-- Step 4: thank you -->
+  <div id="stepThanks" class="card center hidden">
+    <h2 style="color:var(--green);font-size:26px;">Thank you!</h2>
+    <p>In a live version, your details would go straight to the sales team in HubSpot, and you'd get a call within one working day.</p>
+  </div>
+
+  <div class="footer">Built as a growth experiment concept with Claude.</div>
+</div>
+
+<!-- ================= DASHBOARD VIEW ================= -->
+<div id="dashView" class="wrap wide hidden">
+  <div class="note">Experiment dashboard · data stored only in this browser</div>
+  <h1>A/B test: loss framing vs. gain framing</h1>
+  <p class="sub"><b style="color:var(--red)">A</b> shows the money you lose from missed calls. <b style="color:var(--blue)">B</b> shows the extra jobs you could win. Primary metric: <b>lead rate</b> (leads ÷ visitors).</p>
+
+  <div class="actions">
+    <button class="small-btn" id="backBtn">← Back to calculator</button>
+    <button class="small-btn primary" id="simBtn">Simulate 500 visitors</button>
+    <button class="small-btn" id="csvBtn">Download CSV</button>
+    <button class="small-btn" id="resetBtn">Reset data</button>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi"><div class="v" id="kVisitors">0</div><div class="l">Total visitors</div></div>
+    <div class="kpi"><div class="v" id="kLeads">0</div><div class="l">Total leads</div></div>
+    <div class="kpi"><div class="v" id="kUplift">–</div><div class="l">Uplift B vs. A</div></div>
+    <div class="kpi"><div class="v" id="kP">–</div><div class="l">p-value</div></div>
+  </div>
+
+  <div class="card">
+    <h2>Funnel by variant</h2>
+    <table>
+      <thead><tr><th>Step</th><th>A · count</th><th>A · rate</th><th>B · count</th><th>B · rate</th></tr></thead>
+      <tbody id="funnelTable"></tbody>
+    </table>
+    <p class="muted">"Rate" = share of visitors who reached that step.</p>
+  </div>
+
+  <div class="grid">
+    <div class="card"><h2>Variant A · loss</h2><div id="barsA"></div></div>
+    <div class="card"><h2>Variant B · gain</h2><div id="barsB"></div></div>
+  </div>
+
+  <div class="card">
+    <h2>Result</h2>
+    <div id="verdict" class="verdict wait">No data yet. Click "Simulate 500 visitors" or try the calculator yourself.</div>
+    <p class="muted" style="margin-top:12px;">Method: two-proportion z-test on lead rate, two-sided, 95% confidence. In a real test, sample size is fixed in advance and the test runs for at least 2 full weeks to cover weekday effects.</p>
+  </div>
+</div>
+
+<script>
+  // ---------- Storage (works offline; falls back to memory) ----------
+  var memory = {};
+  function load(key, fallback) {
+    try { var v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+    catch (e) { return memory[key] !== undefined ? memory[key] : fallback; }
+  }
+  function save(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) { memory[key] = value; }
+  }
+
+  var STEPS = ["calculator_view", "calculator_complete", "cta_click", "lead_submit"];
+  var STEP_NAMES = { calculator_view: "Visitors", calculator_complete: "Calculated", cta_click: "Clicked CTA", lead_submit: "Leads" };
+
+  function emptyStats() {
+    var s = { A: {}, B: {} };
+    STEPS.forEach(function (st) { s.A[st] = 0; s.B[st] = 0; });
+    return s;
+  }
+  var stats = load("ab_stats", emptyStats());
+  var variant = load("ab_variant", null);
+  var firedThisVisit = {};
+
+  // ---------- Tracking (GA4 plugs in here) ----------
+  window.dataLayer = window.dataLayer || [];
+  function track(eventName) {
+    if (firedThisVisit[eventName]) return;      // count each step once per visitor
+    firedThisVisit[eventName] = true;
+    stats[variant][eventName]++;
+    save("ab_stats", stats);
+    window.dataLayer.push({ event: eventName, experiment: "missed_call_framing", variant: variant });
+    // Live version: gtag('event', eventName, { experiment_variant: variant });
+    console.log("Tracked:", eventName, "| variant", variant);
+  }
+
+  // ---------- Variant assignment (random 50/50, sticky per browser) ----------
+  function assignVariant() {
+    variant = Math.random() < 0.5 ? "A" : "B";
+    save("ab_variant", variant);
+  }
+
+  function applyVariant() {
+    var pill = document.getElementById("variantPill");
+    pill.textContent = variant; pill.className = "pill " + variant;
+    var big = document.getElementById("resultBig");
+    big.className = "big " + variant;
+    if (variant === "A") {
+      document.getElementById("headline").textContent = "How much money do missed calls cost you?";
+      document.getElementById("subline").textContent = "Every call you can't take on the roof or after work is a job that might go to a competitor.";
+      document.getElementById("resultIntro").textContent = "Missed calls cost you about";
+      document.getElementById("resultPitch").textContent = "Porta answers every call for you, 24/7, so you stop losing jobs.";
+      document.getElementById("ctaBtn").textContent = "Stop losing jobs: try 60 free minutes";
+    } else {
+      document.getElementById("headline").textContent = "How many extra jobs could you win this year?";
+      document.getElementById("subline").textContent = "Find out what answering every call, even on the roof or after work, could bring your business.";
+      document.getElementById("resultIntro").textContent = "Answering every call could win you about";
+      document.getElementById("resultPitch").textContent = "Porta answers every call for you, 24/7, and turns it into a new enquiry.";
+      document.getElementById("ctaBtn").textContent = "Win more jobs: try 60 free minutes";
+    }
+  }
+
+  function showStep(id) {
+    ["stepCalc", "stepResult", "stepForm", "stepThanks"].forEach(function (s) {
+      document.getElementById(s).classList.toggle("hidden", s !== id);
+    });
+  }
+
+  function startVisit() {
+    firedThisVisit = {};
+    applyVariant();
+    showStep("stepCalc");
+    track("calculator_view");
+  }
+
+  if (!variant) assignVariant();
+  startVisit();
+
+  // ---------- Calculator flow ----------
+  var euro = new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
+
+  document.getElementById("calcBtn").addEventListener("click", function () {
+    var calls = Math.max(0, Number(document.getElementById("calls").value) || 0);
+    var value = Math.max(0, Number(document.getElementById("jobValue").value) || 0);
+    var rate = Math.min(100, Math.max(0, Number(document.getElementById("winRate").value) || 0)) / 100;
+    var weeks = 46;
+    var jobs = calls * weeks * rate;
+    var total = jobs * value;
+
+    if (variant === "A") {
+      document.getElementById("resultBig").textContent = euro.format(total) + " a year";
+    } else {
+      document.getElementById("resultBig").textContent = "+" + Math.round(jobs) + " jobs";
+    }
+    document.getElementById("breakdown").textContent =
+      calls + " calls × " + weeks + " weeks × " + Math.round(rate * 100) + "% win rate = " +
+      Math.round(jobs) + " jobs × " + euro.format(value) + " = " + euro.format(total) + " a year";
+    showStep("stepResult");
+    track("calculator_complete");
+  });
+
+  document.getElementById("ctaBtn").addEventListener("click", function () {
+    showStep("stepForm");
+    track("cta_click");
+  });
+
+  document.getElementById("submitBtn").addEventListener("click", function () {
+    var email = document.getElementById("email").value.trim();
+    var trade = document.getElementById("trade").value;
+    var team = document.getElementById("team").value;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert("Please enter a valid email address."); return; }
+    if (!trade || !team) { alert("Please choose your trade and team size."); return; }
+    showStep("stepThanks");
+    track("lead_submit");
+  });
+
+  document.getElementById("newVisitorBtn").addEventListener("click", function () {
+    assignVariant();
+    document.getElementById("email").value = "";
+    document.getElementById("trade").value = "";
+    document.getElementById("team").value = "";
+    startVisit();
+  });
+
+  // ---------- Dashboard ----------
+  function erf(x) {
+    var s = x < 0 ? -1 : 1; x = Math.abs(x);
+    var t = 1 / (1 + 0.3275911 * x);
+    var y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x);
+    return s * y;
+  }
+  function normCdf(z) { return 0.5 * (1 + erf(z / Math.SQRT2)); }
+
+  function pct(a, b) { return b > 0 ? (100 * a / b).toFixed(1) + "%" : "–"; }
+
+  function renderBars(v, el) {
+    var n = stats[v].calculator_view, html = "";
+    STEPS.forEach(function (st) {
+      var c = stats[v][st], w = n > 0 ? (100 * c / n) : 0;
+      html += '<div class="bar-row"><div class="bar-label"><span>' + STEP_NAMES[st] + '</span><span>' + c + ' · ' + pct(c, n) + '</span></div>' +
+              '<div class="bar-track"><div class="bar ' + v + '" style="width:' + w + '%"></div></div></div>';
+    });
+    document.getElementById(el).innerHTML = html;
+  }
+
+  function renderDashboard() {
+    var nA = stats.A.calculator_view, nB = stats.B.calculator_view;
+    var lA = stats.A.lead_submit, lB = stats.B.lead_submit;
+
+    var rows = "";
+    STEPS.forEach(function (st) {
+      rows += "<tr><td>" + STEP_NAMES[st] + "</td><td>" + stats.A[st] + "</td><td>" + pct(stats.A[st], nA) +
+              "</td><td>" + stats.B[st] + "</td><td>" + pct(stats.B[st], nB) + "</td></tr>";
+    });
+    document.getElementById("funnelTable").innerHTML = rows;
+    renderBars("A", "barsA"); renderBars("B", "barsB");
+
+    document.getElementById("kVisitors").textContent = nA + nB;
+    document.getElementById("kLeads").textContent = lA + lB;
+
+    var verdict = document.getElementById("verdict");
+    if (nA < 1 || nB < 1 || (lA + lB) === 0) {
+      document.getElementById("kUplift").textContent = "–";
+      document.getElementById("kP").textContent = "–";
+      verdict.className = "verdict wait";
+      verdict.textContent = "Not enough data yet. Click \"Simulate 500 visitors\" or try the calculator yourself.";
+      return;
+    }
+
+    var pA = lA / nA, pB = lB / nB;
+    var pPool = (lA + lB) / (nA + nB);
+    var se = Math.sqrt(pPool * (1 - pPool) * (1 / nA + 1 / nB));
+    var z = se > 0 ? (pB - pA) / se : 0;
+    var p = 2 * (1 - normCdf(Math.abs(z)));
+    var uplift = pA > 0 ? (pB - pA) / pA * 100 : 0;
+
+    document.getElementById("kUplift").textContent = (uplift >= 0 ? "+" : "") + uplift.toFixed(1) + "%";
+    document.getElementById("kP").textContent = p < 0.001 ? "<0.001" : p.toFixed(3);
+
+    var lead = "Lead rate A: <b>" + (pA * 100).toFixed(1) + "%</b> · Lead rate B: <b>" + (pB * 100).toFixed(1) + "%</b>. ";
+    if (p < 0.05) {
+      var winner = pB > pA ? "B (gain framing)" : "A (loss framing)";
+      verdict.className = "verdict win";
+      verdict.innerHTML = lead + "<br><b>Variant " + winner + " wins</b> with 95% confidence (p = " + p.toFixed(3) + "). Next step: roll out the winner and test the next idea, e.g. the CTA wording.";
+    } else {
+      verdict.className = "verdict wait";
+      verdict.innerHTML = lead + "<br><b>No significant difference yet</b> (p = " + p.toFixed(3) + "). Keep the test running until the planned sample size is reached; don't stop early.";
+    }
+  }
+
+  // Sample data: B is set slightly better at the CTA and form steps
+  document.getElementById("simBtn").addEventListener("click", function () {
+    var truth = {
+      A: { complete: 0.55, cta: 0.30, lead: 0.38 },
+      B: { complete: 0.57, cta: 0.38, lead: 0.42 }
+    };
+    for (var i = 0; i < 500; i++) {
+      var v = Math.random() < 0.5 ? "A" : "B", t = truth[v];
+      stats[v].calculator_view++;
+      if (Math.random() < t.complete) {
+        stats[v].calculator_complete++;
+        if (Math.random() < t.cta) {
+          stats[v].cta_click++;
+          if (Math.random() < t.lead) stats[v].lead_submit++;
+        }
+      }
+    }
+    save("ab_stats", stats);
+    renderDashboard();
+  });
+
+  document.getElementById("resetBtn").addEventListener("click", function () {
+    if (!confirm("Delete all test data in this browser?")) return;
+    stats = emptyStats(); save("ab_stats", stats); renderDashboard();
+  });
+
+  document.getElementById("csvBtn").addEventListener("click", function () {
+    var csv = "variant," + STEPS.join(",") + "\n";
+    ["A", "B"].forEach(function (v) { csv += v + "," + STEPS.map(function (st) { return stats[v][st]; }).join(",") + "\n"; });
+    var blob = new Blob([csv], { type: "text/csv" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = "ab_test_results.csv";
+    document.body.appendChild(a); a.click(); a.remove();
+  });
+
+  document.getElementById("toDashBtn").addEventListener("click", function () {
+    document.getElementById("calcView").classList.add("hidden");
+    document.getElementById("dashView").classList.remove("hidden");
+    renderDashboard();
+  });
+  document.getElementById("backBtn").addEventListener("click", function () {
+    document.getElementById("dashView").classList.add("hidden");
+    document.getElementById("calcView").classList.remove("hidden");
+  });
+</script>
+</body>
+</html>
