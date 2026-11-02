@@ -104,6 +104,18 @@ ul.plain{list-style:none}
 ul.plain li{padding:8px 0;border-bottom:1px solid var(--line);font-size:15px}
 ul.plain li:last-child{border-bottom:0}
 
+/* value */
+.value{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media (max-width:760px){.value{grid-template-columns:1fr}}
+.value .num{font-size:13px;font-weight:700;color:#fff;background:var(--blue);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+.job .ctx{font-size:14px;color:var(--muted);margin:-6px 0 10px}
+.job .win{background:var(--sky);border-left:3px solid var(--blue);padding:10px 14px;border-radius:6px;margin-top:12px;font-size:15px}
+.job .win b{color:var(--navy)}
+.job .tags{margin-top:10px}
+.card{transition:transform .15s ease, box-shadow .15s ease}
+.card:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(11,37,69,.08)}
+.projgrid .card.wide{grid-column:1/-1}
+
 /* contact */
 .contact{background:var(--navy);color:#fff;text-align:center}
 .contact h2{color:#fff}
@@ -124,6 +136,7 @@ footer{background:var(--navy);color:#9FB0C8;text-align:center;font-size:13px;pad
       <li><a href="#projects">AI Projects</a></li>
       <li><a href="#experience">Experience</a></li>
       <li><a href="#skills">Skills</a></li>
+      <li><a href="#education">Education</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
   </div>
@@ -164,10 +177,22 @@ footer{background:var(--navy);color:#9FB0C8;text-align:center;font-size:13px;pad
   </div>
 </section>
 
-<section id="projects" class="alt">
+<section id="value" class="alt">
+  <div class="wrap">
+    <h2>What I can do for your team</h2>
+    <p class="sub">Three things I deliver in every role.</p>
+    <div class="value">
+      <div class="card"><div class="num">1</div><h3>Find what the data is really saying</h3><p>Clean and connect data from multiple sources, track KPIs and dig into anomalies with SQL, BigQuery and Looker until the root cause is clear.</p></div>
+      <div class="card"><div class="num">2</div><h3>Make reporting effortless</h3><p>Replace manual spreadsheets with Power BI and Looker dashboards that managers open every day. At Mattioli Woods, this saved a full working day every week.</p></div>
+      <div class="card"><div class="num">3</div><h3>Automate the repetitive work</h3><p>Design AI agents and workflows in Gemini, Atlassian Rovo and Claude that take over ticket analysis, KPI reporting and documentation.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="projects">
   <div class="wrap">
     <h2>AI Projects</h2>
-    <p class="sub">Live demos I built with AI for small trade businesses. Click to try them.</p>
+    <p class="sub">Products I designed and built with AI for small trade businesses. All demos are live, so click to try them.</p>
     <div class="projgrid">
       <div class="card proj">
         <div class="kicker">AI app</div>
@@ -193,26 +218,37 @@ footer{background:var(--navy);color:#9FB0C8;text-align:center;font-size:13px;pad
         <p>Loss vs. gain framing with a live funnel dashboard, lead-rate tracking and a two-proportion z-test for significance.</p>
         <a class="go" href="https://tehreemmuzammil.github.io/tehreemmuz.github.io/missed-call%20calculator-AB-test.html" target="_blank" rel="noopener">Open live demo →</a>
       </div>
+      <div class="card proj wide">
+        <div class="kicker">Lead generation · Funnel tracking</div>
+        <h3>Missed-Call Calculator</h3>
+        <p>A lead-generation tool for tradespeople: visitors calculate what missed calls cost them, then sign up through an email capture form. Every funnel step is tracked as an event, and the flow is designed to hand leads to a sales CRM such as HubSpot.</p>
+        <a class="go" href="https://tehreemmuzammil.github.io/tehreemmuz.github.io/missed-call-calculator/" target="_blank" rel="noopener">Open live demo →</a>
+      </div>
     </div>
   </div>
 </section>
 
-<section id="experience">
+<section id="experience" class="alt">
   <div class="wrap">
     <h2>Experience</h2>
-    <p class="sub">Results first. Full details in my <a href="Tehreem_Muzammil_CV.pdf" download>CV</a>.</p>
+    <p class="sub">What I did, and what changed because of it. Download the <a href="Tehreem_Muzammil_CV.pdf" download>full CV</a>.</p>
 
     <div class="job">
-      <div class="when">Dec 2025 – Present</div>
+      <div class="when">Dec 2025 – Present<br>Hamburg · Hybrid</div>
       <div>
         <h3>Business Analyst (Process Owner &amp; Operations)</h3>
-        <div class="org">ABOUT YOU · Fashion e-commerce, 38M+ orders a year · Hamburg</div>
+        <div class="org">ABOUT YOU · Fashion e-commerce, 38M+ orders a year</div>
+        <div class="ctx">Partner Business &amp; Services · Multichannel Fulfilment &amp; External Marketplace Operations</div>
         <ul>
-          <li>Build <b>AI agents and workflows</b> in Gemini and Atlassian Rovo that automate ticket analysis and KPI reporting, saving <b>~5 hours a week</b></li>
-          <li>Led an AI-assisted analysis of <b>1,000+ support tickets</b> to build a central Confluence solutions directory</li>
-          <li>Cut ticket resolution time and IT support workload by <b>up to 25%</b> by standardising fixes for recurring issues</li>
-          <li>Own <b>20+ operational KPIs</b> across 3 fulfilment models and resolve <b>10+ anomalies a month</b> with SQL and Looker</li>
+          <li><b>AI automation:</b> Build AI agents and workflows in Gemini and Atlassian Rovo that automate ticket analysis, KPI reporting and documentation</li>
+          <li><b>KPI monitoring:</b> Own 20+ operational KPIs across 3 fulfilment models: drop-shipping, partner fulfilment and own warehouse</li>
+          <li><b>Root-cause analysis:</b> Investigate and resolve 10+ KPI deviations and data anomalies a month with SQL, Google BigQuery and Looker</li>
+          <li><b>Knowledge management:</b> Led an AI-assisted analysis of 1,000+ resolved support tickets (2022–2025) to build a central solutions directory in Confluence</li>
+          <li><b>Prompt engineering:</b> Use Claude, ChatGPT and Gemini to speed up data analysis, checks and reporting</li>
+          <li><b>Process improvement:</b> Standardise fixes for recurring issues and align priorities with operations and tech teams in Jira</li>
         </ul>
+        <div class="win"><b>Impact:</b> ~5 hours of manual work saved every week · up to 25% faster ticket resolution and lower IT support workload · one central knowledge base built from 1,000+ tickets</div>
+        <div class="tags"><span class="tag">AI agents</span><span class="tag">Gemini</span><span class="tag">Atlassian Rovo</span><span class="tag">SQL</span><span class="tag">BigQuery</span><span class="tag">Looker</span><span class="tag">Jira</span><span class="tag">Confluence</span></div>
       </div>
     </div>
 
@@ -222,57 +258,74 @@ footer{background:var(--navy);color:#9FB0C8;text-align:center;font-size:13px;pad
     </div>
 
     <div class="job">
-      <div class="when">May 2024 – Jan 2025</div>
+      <div class="when">May 2024 – Jan 2025<br>Gloucestershire, UK · On-site</div>
       <div>
         <h3>Data Administrator (Reporting &amp; Analytics)</h3>
-        <div class="org">NHS Mental Health Services · 25,000+ referrals a year · United Kingdom</div>
+        <div class="org">NHS Mental Health Services · County-wide, 25,000+ referrals a year, 4 clinical teams</div>
         <ul>
-          <li>Raised data accuracy by <b>20%</b> through validation and data governance checks</li>
-          <li>Built real-time <b>Power BI dashboards</b> on referrals, waiting times and appointments for 4 clinical teams</li>
-          <li>Lifted team productivity by <b>15%</b> and freed up <b>a full working week</b> by automating recurring reports</li>
+          <li><b>Data governance:</b> Ran end-of-day validation and governance checks across the IAPTUS and RIO case-management databases</li>
+          <li><b>Dashboards:</b> Built real-time Power BI management dashboards with interactive filters on referral volumes, waiting times and appointments</li>
+          <li><b>Automation:</b> Automated recurring reports and referral workflows to remove manual work</li>
+          <li><b>Productivity:</b> Used data analysis and process automation to improve productivity across 4 clinical teams</li>
+          <li><b>Training:</b> Ran monthly training for 10+ colleagues on data tools, advanced Excel and LOOKUP formulas</li>
         </ul>
+        <div class="win"><b>Impact:</b> 20% higher data accuracy · 15% higher team productivity · a full working week of manual effort freed up</div>
+        <div class="tags"><span class="tag">Power BI</span><span class="tag">Data governance</span><span class="tag">Data validation</span><span class="tag">Excel</span><span class="tag">Process automation</span></div>
       </div>
     </div>
 
     <div class="job">
-      <div class="when">Dec 2022 – Dec 2023</div>
+      <div class="when">Dec 2022 – Dec 2023<br>Leicester, UK · Hybrid</div>
       <div>
         <h3>Business Analyst</h3>
-        <div class="org">Mattioli Woods · Wealth management, £16bn+ client assets · United Kingdom</div>
+        <div class="org">Mattioli Woods plc · Wealth management, £16bn+ client assets, 16,000+ clients, 900+ employees</div>
         <ul>
-          <li>Delivered monthly <b>financial and performance KPI reporting</b> to 5 departments</li>
-          <li>Built Power BI and Excel dashboards that saved <b>a full working day every week</b></li>
-          <li>Cut invoice posting errors by <b>25%</b> with standardised accounts payable controls across 500+ invoices a month</li>
+          <li><b>KPI reporting:</b> Delivered monthly financial and performance KPI reports to 5 departments</li>
+          <li><b>Dashboards:</b> Built Power BI and Excel dashboards that replaced manual reporting</li>
+          <li><b>Accounts payable:</b> Validated 500+ supplier invoices a month and introduced standardised posting controls</li>
+          <li><b>Data quality:</b> Cleaned and reconciled data in SQL Server, Excel and Dynamics 365 to remove inconsistencies before reporting</li>
+          <li><b>Stakeholder insights:</b> Presented monthly performance insights to 10+ stakeholders as clear business recommendations</li>
         </ul>
+        <div class="win"><b>Impact:</b> a full working day saved every week · 25% fewer invoice posting errors · reliable financial KPI reporting for 5 departments</div>
+        <div class="tags"><span class="tag">Power BI</span><span class="tag">Financial reporting</span><span class="tag">Accounts payable</span><span class="tag">SQL Server</span><span class="tag">Dynamics 365</span></div>
       </div>
     </div>
 
     <div class="job">
-      <div class="when">Aug 2020 – Sep 2021</div>
+      <div class="when">Aug 2020 – Sep 2021<br>Karachi, Pakistan</div>
       <div>
         <h3>E-Commerce Analyst</h3>
-        <div class="org">Enablers · E-commerce consultancy · Pakistan</div>
+        <div class="org">Enablers · E-commerce consultancy, 11 offices, 15+ client brands</div>
         <ul>
-          <li>Lifted ROAS by <b>20%</b> across <b>15+ client brands</b> by optimising conversion rate and campaign KPIs</li>
-          <li>Improved analytics efficiency by <b>30%</b> by training teams on data quality and analytics practices</li>
+          <li><b>Performance analysis:</b> Analysed website traffic and Amazon Seller Central sales data for 15+ client brands</li>
+          <li><b>Campaign optimisation:</b> Optimised conversion rate, average order value and paid campaign (PPC) KPIs</li>
+          <li><b>Market research:</b> Researched industry trends and competitors across 5+ product categories to guide strategy</li>
+          <li><b>Training:</b> Trained 200+ e-commerce virtual assistants on data quality and Seller Central analytics</li>
+          <li><b>Collaboration:</b> Worked with social media marketing teams on campaigns that increased user engagement</li>
         </ul>
+        <div class="win"><b>Impact:</b> 20% higher ROAS across client brands · 30% higher analytics efficiency through team training</div>
+        <div class="tags"><span class="tag">PPC</span><span class="tag">E-commerce analytics</span><span class="tag">Amazon Seller Central</span><span class="tag">Market research</span></div>
       </div>
     </div>
 
     <div class="job">
-      <div class="when">Jan 2016 – Jul 2020</div>
+      <div class="when">Jan 2016 – Jul 2020<br>Karachi, Pakistan</div>
       <div>
         <h3>Junior Business Analyst (Part-time)</h3>
-        <div class="org">Khan's Academy · Pakistan</div>
+        <div class="org">Khan's Academy</div>
         <ul>
-          <li>Delivered <b>20+ data-driven recommendations</b> from KPI analysis of 30+ campaigns and cut admin costs by <b>15%</b></li>
+          <li><b>Business analysis:</b> Assessed processes to find inefficiencies and recommend practical improvements</li>
+          <li><b>Data management:</b> Analysed student performance data and built KPI reports to support curriculum decisions</li>
+          <li><b>Campaign analysis:</b> Analysed KPIs for 30+ campaigns and delivered 20+ data-driven recommendations</li>
+          <li><b>Payroll:</b> Managed payroll processes, ensuring accurate salary calculations and policy compliance</li>
         </ul>
+        <div class="win"><b>Impact:</b> 15% lower administrative costs · better-informed curriculum decisions</div>
       </div>
     </div>
   </div>
 </section>
 
-<section id="skills" class="alt">
+<section id="skills">
   <div class="wrap">
     <h2>Skills</h2>
     <p class="sub">What I do, and the tools I do it with.</p>
@@ -287,10 +340,10 @@ footer{background:var(--navy);color:#9FB0C8;text-align:center;font-size:13px;pad
   </div>
 </section>
 
-<section id="education">
+<section id="education" class="alt">
   <div class="wrap">
     <h2>Education &amp; Certifications</h2>
-    <p class="sub">&nbsp;</p>
+    <p class="sub">Two Master's degrees and continuous learning in AI.</p>
     <div class="edu">
       <div class="card">
         <h3>MSc Economics (in progress)</h3><div class="when">Kiel University (CAU) · Sep 2025 – Present</div>
